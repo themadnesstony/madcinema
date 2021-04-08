@@ -12,9 +12,6 @@ const commandParts = require('telegraf-command-parts');
 
 const axios = require('axios');
 
-const {loadMovieTemplate} = require('./helpers/templates');
-const {makeURI, generateSearchUrl} = require('./helpers/additionalFunctions');
-
 // #########################
 // Init bot
 // #########################
@@ -44,88 +41,76 @@ db.defaults({ users: [] })
 bot.use(commandParts());
 
 // #########################
+// Import commands
+// #########################
+const movieSearch = require('./commands/movie');
+const languageSelect = require('./commands/language');
+
+// #########################
 // Start using bot
 // #########################
 bot.start((ctx) => {
   ctx.reply(`Welcome, ${ctx.message.chat.username}`);
   db.get('users')
-  .push({ id: ctx.from.id, lang: ctx.from.language_code})
+  .push({ id: ctx.from.id, lang: ctx.from.language_code ? ctx.from.language_code : 'en'})
   .write()
 });
 
-// Select language
-bot.command('language', (ctx) => {
-  const chatId = ctx.message.chat.id;
+// #########################
+// Commands
+// #########################
+bot.command('language', languageSelect);
+bot.command('movie', movieSearch);
 
-  ctx.telegram.sendMessage(chatId, 'Select a language', {
-    reply_markup: {
-      inline_keyboard: [
-        [{text: 'English', callback_data: 'en'}, {text: 'Russian', callback_data: 'ru'}]
-      ]
-    }
-  });
 
-});
-
+// #########################
+// Actions
+// #########################
 bot.action('en', (ctx) => {
   let id = ctx.from.id;
-  if (db.get('users').find({id: id}).value()) {
-    console.log('User exists');
+  let user = db.get('users').find({id: id}).value();
+
+  if (user) {
+    db.get('users')
+    .find({id: id})
+    .assign({lang: 'en'})
+    .write()
   }else {
     console.log('User not find');
   }
   ctx.deleteMessage();
-
 });
 
 bot.action('ru', (ctx) => {
+  let id = ctx.from.id;
+  let user = db.get('users').find({id: id}).value();
+
+  if (user) {
+    db.get('users')
+    .find({id: id})
+    .assign({lang: 'ru'})
+    .write()
+  }else {
+    console.log('User not find');
+  }
   ctx.deleteMessage();
-  // state.lang='ru';  console.log(state);
 });
 
 // TODO: условие, если нет какого либо из полей - "то выводить данных нет". Если ничего не найдено - соответственно.
 // TODO: Если нет на каком то языке - выводить другой
 // TODO: settings command - настройка количества выводимых результатов
 
-// Movie search
-bot.command('movie', (ctx) => {
-  const chatId = ctx.message.chat.id;
-  const user = db.get('users').find({id: ctx.from.id}).value();
 
-  let movieName = makeURI(ctx);
-  let searchUrl = generateSearchUrl('movie', movieName, lang=user.lang);
-
-  let data;
-
-  axios.get(searchUrl).then((res) => {
-
-    if (!res.data) {
-      bot.telegram.sendMessage(chatId, 'No movie found');
-    }else {
-      data = JSON.parse(JSON.stringify(res.data.results[0]));
-
-      loadMovieTemplate(bot, chatId, data);
-    }
-  }).catch((err) => {
-    console.log(err);
-    bot.telegram.sendMessage(chatId, 'No movie found');
-    if (err.response) {
-      console.log(err.response.data);
-      console.log(err.response.status);
-      console.log(err.response.headers);
-    }
-  });
-
-});
-
+// #########################
+// Error handling
+// #########################
 bot.catch((err) => {
   console.log(err);
 });
 
-bot.command('test', ctx => {
-  console.log(ctx.from);
-});
-
+// #########################
+// Launch
+// #########################
 bot.launch();
 
 // #########################

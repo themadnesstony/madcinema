@@ -12,6 +12,15 @@
     "type": "git",
     "url": "git+https://github.com/themadnesstony/madcinema.git"
   },
+  "keywords": [
+    "telegram",
+    "telegram bot",
+    "telegraf",
+    "telegram bot api",
+    "api",
+    "movie search",
+    "movie api"
+  ],
   "author": "themadnesstony",
   "license": "ISC",
   "bugs": {
