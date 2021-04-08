@@ -1,0 +1,31 @@
+{
+  "name": "madcinema",
+  "version": "1.0.0",
+  "description": "Telegram movie search bot",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node bot.js",
+    "clean_db": "echo > db.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/themadnesstony/madcinema.git"
+  },
+  "author": "themadnesstony",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/themadnesstony/madcinema/issues"
+  },
+  "homepage": "https://github.com/themadnesstony/madcinema#readme",
+  "devDependencies": {
+    "dotenv": "^8.2.0"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "lowdb": "^1.0.0",
+    "telegraf": "3.33",
+    "telegraf-command-parts": "^1.0.3",
+    "telegraf-i18n": "^6.6.0"
+  }
+}
