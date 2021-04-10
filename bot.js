@@ -8,9 +8,12 @@ require('dotenv').config();
 const path = require('path');
 
 const Telegraf = require('telegraf');
+const session = require('telegraf/session');
 const commandParts = require('telegraf-command-parts');
 
 const axios = require('axios');
+
+const { loadMovieTemplate } = require('./helpers/templates');
 
 // #########################
 // Init bot
@@ -39,6 +42,7 @@ db.defaults({ users: [] })
 // Middleware
 // #########################
 bot.use(commandParts());
+bot.use(session());
 
 // #########################
 // Import commands
@@ -66,6 +70,8 @@ bot.command('movie', movieSearch);
 // #########################
 // Actions
 // #########################
+
+// Select English language
 bot.action('en', (ctx) => {
   let id = ctx.from.id;
   let user = db.get('users').find({id: id}).value();
@@ -81,6 +87,7 @@ bot.action('en', (ctx) => {
   ctx.deleteMessage();
 });
 
+// Select Russian language
 bot.action('ru', (ctx) => {
   let id = ctx.from.id;
   let user = db.get('users').find({id: id}).value();
@@ -96,10 +103,38 @@ bot.action('ru', (ctx) => {
   ctx.deleteMessage();
 });
 
-// TODO: условие, если нет какого либо из полей - "то выводить данных нет". Если ничего не найдено - соответственно.
-// TODO: Если нет на каком то языке - выводить другой
-// TODO: settings command - настройка количества выводимых результатов
+// Back from menu
+bot.action('back', (ctx) => {
+  ctx.deleteMessage();
+  ctx.session.state = {};
+});
 
+// Previous result
+bot.action('prev', (ctx) => {
+  if (ctx.session.state.resultNum === 0) {
+    return;
+  }else {
+    ctx.deleteMessage();
+    loadMovieTemplate(ctx, ctx.session.state.chatId, ctx.session.state.data, ctx.session.state.resultNum--);
+  }
+});
+
+// More info about cinema
+bot.action('more', (ctx) => {
+  console.log('More info about cinema here');
+});
+
+// Next result
+bot.action('next', (ctx) => {
+  if (ctx.session.state.resultNum + 1 === ctx.session.state.data.total_results) {
+    return;
+  }else {
+    ctx.deleteMessage();
+    loadMovieTemplate(ctx, ctx.session.state.chatId, ctx.session.state.data, ctx.session.state.resultNum++);
+  }
+});
+
+// TODO: settings command - configure count of output results
 
 // #########################
 // Error handling
@@ -116,5 +151,5 @@ bot.launch();
 // #########################
 // Enable graceful stop
 // #########################
-process.once('SIGINT', () => bot.stop('SIGINT'))
-process.once('SIGTERM', () => bot.stop('SIGTERM'))
+process.once('SIGINT', () => bot.stop('SIGINT'));
+process.once('SIGTERM', () => bot.stop('SIGTERM'));

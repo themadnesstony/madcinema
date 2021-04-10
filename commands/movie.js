@@ -4,8 +4,8 @@ const adapter = new FileSync('db.json');
 
 const axios = require('axios');
 
-const {loadMovieTemplate} = require('../helpers/templates');
-const {makeURI, generateSearchUrl} = require('../helpers/additionalFunctions');
+const { loadMovieTemplate } = require('../helpers/templates');
+const { makeURI, generateSearchUrl } = require('../helpers/additionalFunctions');
 
 module.exports = async (ctx) => {
   const chatId = ctx.message.chat.id;
@@ -23,7 +23,7 @@ module.exports = async (ctx) => {
     if (!res.data) {
       ctx.telegram.sendMessage(chatId, 'No movie found');
     }else {
-      data = JSON.parse(JSON.stringify(res.data.results[0]));
+      data = JSON.parse(JSON.stringify(res.data));
 
       loadMovieTemplate(ctx, chatId, data);
     }
@@ -37,3 +37,5 @@ module.exports = async (ctx) => {
     }
   });
 }
+// TODO: парсинг жанров, даты
+// TODO: добавить кнопку поиска похожих фильмов к каждому результату
