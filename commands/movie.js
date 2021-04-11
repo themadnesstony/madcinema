@@ -16,7 +16,6 @@ module.exports = async (ctx) => {
   let searchUrl = generateSearchUrl('movie', movieName, lang=user.lang);
 
   let data;
-  console.log(searchUrl);
 
   axios.get(searchUrl).then((res) => {
 

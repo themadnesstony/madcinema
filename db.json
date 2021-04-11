@@ -2,7 +2,8 @@
   "users": [
     {
       "id": 289139982,
-      "lang": "ru"
+      "lang": "ru",
+      "results_limit": 20
     }
   ]
 }

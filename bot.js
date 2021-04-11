@@ -49,6 +49,7 @@ bot.use(session());
 // #########################
 const movieSearch = require('./commands/movie');
 const languageSelect = require('./commands/language');
+const settings = require('./commands/settings');
 
 // #########################
 // Start using bot
@@ -56,7 +57,7 @@ const languageSelect = require('./commands/language');
 bot.start((ctx) => {
   ctx.reply(`Welcome, ${ctx.message.chat.username}`);
   db.get('users')
-  .push({ id: ctx.from.id, lang: ctx.from.language_code ? ctx.from.language_code : 'en'})
+  .push({ id: ctx.from.id, lang: ctx.from.language_code ? ctx.from.language_code : 'en', results_limit: 20})
   .write()
 });
 
@@ -65,6 +66,7 @@ bot.start((ctx) => {
 // #########################
 bot.command('language', languageSelect);
 bot.command('movie', movieSearch);
+bot.command('settings', settings);
 
 
 // #########################
@@ -106,7 +108,7 @@ bot.action('ru', (ctx) => {
 // Back from menu
 bot.action('back', (ctx) => {
   ctx.deleteMessage();
-  ctx.session.state = {};
+  // ctx.session.state = {};
 });
 
 // Previous result
@@ -115,7 +117,8 @@ bot.action('prev', (ctx) => {
     return;
   }else {
     ctx.deleteMessage();
-    loadMovieTemplate(ctx, ctx.session.state.chatId, ctx.session.state.data, ctx.session.state.resultNum--);
+    ctx.session.state.resultNum--;
+    loadMovieTemplate(ctx, ctx.session.state.chatId, ctx.session.state.data);
   }
 });
 
@@ -130,11 +133,10 @@ bot.action('next', (ctx) => {
     return;
   }else {
     ctx.deleteMessage();
-    loadMovieTemplate(ctx, ctx.session.state.chatId, ctx.session.state.data, ctx.session.state.resultNum++);
+    ctx.session.state.resultNum++;
+    loadMovieTemplate(ctx, ctx.session.state.chatId, ctx.session.state.data);
   }
 });
-
-// TODO: settings command - configure count of output results
 
 // #########################
 // Error handling

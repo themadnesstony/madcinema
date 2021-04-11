@@ -1,6 +1,6 @@
 const { cinemaNavigation } = require('../helpers/additionalFunctions');
 
-function loadMovieTemplate(ctx, chatId, data, resultNum = 0) {
+function loadMovieTemplate(ctx, chatId, data) {
   // Push results in user session
   if (!ctx.session.state) {
     ctx.session.state = {
@@ -10,13 +10,7 @@ function loadMovieTemplate(ctx, chatId, data, resultNum = 0) {
     }
   }
 
-  if (resultNum === 0) {
-    ctx.session.state.currentResult = data.results[ctx.session.state.resultNum];
-    ctx.session.state.resultNum;
-  }else {
-    ctx.session.state.currentResult = data.results[0];
-    ctx.session.state.resultNum = 0;
-  }
+  ctx.session.state.currentResult = ctx.session.state.data.results[ctx.session.state.resultNum];
 
   let res = ctx.session.state.currentResult;
 
