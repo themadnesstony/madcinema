@@ -15,6 +15,11 @@ module.exports = async (ctx) => {
   let movieName = makeURI(ctx);
   let searchUrl = generateSearchUrl('movie', movieName, lang=user.lang);
 
+  // Reset previous results
+  if (ctx.session.state) {
+    let messageId = ctx.session.state.lastMessageId.toString();
+    ctx.telegram.deleteMessage(chatId, messageId);
+  }
   ctx.session.state = {};
 
   let data;

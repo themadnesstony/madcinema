@@ -6,7 +6,8 @@ function loadMovieTemplate(ctx, chatId, data) {
     ctx.session.state = {
       data: data,
       chatId: chatId,
-      resultNum: ctx.session.state.resultNum ? ctx.session.state.resultNum : 0
+      resultNum: ctx.session.state.resultNum ? ctx.session.state.resultNum : 0,
+      lastMessageId: 0
     }
   }
 

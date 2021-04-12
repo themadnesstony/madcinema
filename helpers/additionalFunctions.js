@@ -16,6 +16,8 @@ function cinemaNavigation(ctx, chatId, msg, data) {
         [{text: 'Back', callback_data: 'back'}]
       ]
     }
+  }).then((res) => {
+    ctx.session.state.lastMessageId = res.message_id;
   });
 }
 
