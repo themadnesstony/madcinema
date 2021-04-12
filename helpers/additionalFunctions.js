@@ -11,7 +11,7 @@ function cinemaNavigation(ctx, chatId, msg, data) {
   ctx.telegram.sendMessage(chatId, msg, {
     reply_markup: {
       inline_keyboard: [
-        [{text: `Results: ${currentResult} of ${data.total_results}`, callback_data: 'results'}],
+        [{text: `Results: ${currentResult} of 20`, callback_data: 'results'}],
         [{text: 'Previous', callback_data: 'prev'},{text: 'More', callback_data: 'more'}, {text: 'Next', callback_data: 'next'}],
         [{text: 'Back', callback_data: 'back'}]
       ]

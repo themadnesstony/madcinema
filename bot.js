@@ -49,7 +49,6 @@ bot.use(session());
 // #########################
 const movieSearch = require('./commands/movie');
 const languageSelect = require('./commands/language');
-const settings = require('./commands/settings');
 
 // #########################
 // Start using bot
@@ -57,7 +56,7 @@ const settings = require('./commands/settings');
 bot.start((ctx) => {
   ctx.reply(`Welcome, ${ctx.message.chat.username}`);
   db.get('users')
-  .push({ id: ctx.from.id, lang: ctx.from.language_code ? ctx.from.language_code : 'en', results_limit: 20})
+  .push({ id: ctx.from.id, lang: ctx.from.language_code ? ctx.from.language_code : 'en'})
   .write()
 });
 
@@ -66,8 +65,6 @@ bot.start((ctx) => {
 // #########################
 bot.command('language', languageSelect);
 bot.command('movie', movieSearch);
-bot.command('settings', settings);
-
 
 // #########################
 // Actions
@@ -108,7 +105,7 @@ bot.action('ru', (ctx) => {
 // Back from menu
 bot.action('back', (ctx) => {
   ctx.deleteMessage();
-  // ctx.session.state = {};
+  ctx.session.state = {};
 });
 
 // Previous result
@@ -129,7 +126,7 @@ bot.action('more', (ctx) => {
 
 // Next result
 bot.action('next', (ctx) => {
-  if (ctx.session.state.resultNum + 1 === ctx.session.state.data.total_results) {
+  if (ctx.session.state.resultNum + 1 === ctx.session.state.data.total_results || ctx.session.state.resultNum === 19) {
     return;
   }else {
     ctx.deleteMessage();

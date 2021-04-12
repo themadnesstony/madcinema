@@ -2,11 +2,11 @@ const { cinemaNavigation } = require('../helpers/additionalFunctions');
 
 function loadMovieTemplate(ctx, chatId, data) {
   // Push results in user session
-  if (!ctx.session.state) {
+  if (!ctx.session.state || ctx.session.state !== {}) {
     ctx.session.state = {
       data: data,
       chatId: chatId,
-      resultNum: 0
+      resultNum: ctx.session.state.resultNum ? ctx.session.state.resultNum : 0
     }
   }
 
@@ -43,5 +43,3 @@ function loadTvTemplate(ctx, chatId, data) {
 }
 
 module.exports = { loadMovieTemplate, loadTvTemplate };
-// TODO: условие, если нет какого либо из полей - "то выводить данных нет". Если ничего не найдено - соответственно.
-// TODO: Если нет на каком то языке - выводить другой
