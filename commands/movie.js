@@ -5,7 +5,7 @@ const adapter = new FileSync('db.json');
 const axios = require('axios');
 
 const { loadMovieTemplate } = require('../helpers/templates');
-const { makeURI, generateSearchUrl } = require('../helpers/additionalFunctions');
+const { makeURI, generateSearchUrl, generateDetailSearchUrl } = require('../helpers/additionalFunctions');
 
 module.exports = async (ctx) => {
   const chatId = ctx.message.chat.id;
@@ -25,14 +25,37 @@ module.exports = async (ctx) => {
   let data;
 
   axios.get(searchUrl).then((res) => {
+    let movieIds = [];
 
     if (!res.data) {
       ctx.telegram.sendMessage(chatId, 'No movie found');
     }else {
       data = JSON.parse(JSON.stringify(res.data));
 
-      loadMovieTemplate(ctx, chatId, data);
+      movieIds = data.results.map((res) => {
+        return res.id;
+      });
     }
+
+    let itemsProcessed = 1;
+    data.results = [];
+
+    async function getDetailedData() {
+      for (const id of movieIds) {
+        let detailUrl = generateDetailSearchUrl('movie', id, lang=user.lang);
+        await axios.get(detailUrl).then((res) => {
+          data.results.push(res.data);
+          if (itemsProcessed === movieIds.length) {
+            loadMovieTemplate(ctx, chatId, data);
+          }
+          itemsProcessed++;
+        }).catch((err) => {
+            console.log(err);
+        })
+      }
+    }
+    getDetailedData();
+
   }).catch((err) => {
     console.log(err);
     ctx.telegram.sendMessage(chatId, 'No movie found');
@@ -43,5 +66,4 @@ module.exports = async (ctx) => {
     }
   });
 }
-// TODO: парсинг жанров, даты
 // TODO: добавить кнопку поиска похожих фильмов к каждому результату
